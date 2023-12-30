@@ -1,7 +1,6 @@
 #include <iostream>
 using namespace std; // needed for just  cout << 
 #include "MathExpr.h"
-#include "BoolExpr.h"
 #include <string>
 #include <iomanip> // for std::setprecision
 
@@ -11,6 +10,7 @@ class Relation {
         Relation(string rel);
         string cmp(string a, string b);
         string getRel();
+        void setRel(string r);
         void setPos(int p);
         int getPos();
         string parse();
@@ -28,4 +28,5 @@ class MathRelation : Relation {
         string parse(string rel);
     private:
         string exprRel;
+        int ref;
 };
