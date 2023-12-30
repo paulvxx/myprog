@@ -67,35 +67,34 @@ double MathExpr::parseFact(bool u) {
 double MathExpr::parse(bool cmp) {
     pos = 0;
     double result = parseExpr();
+    //cout << (this->expr).substr(pos, this->expr.length()-pos) << endl;
     eat(true, '\0');
-    if (pos < expr.length()) {
-        // ==, <=, or >=
-        bool twoCharOp = cmp && (pos+2) >= expr.length() && (expr.substr(pos,2)=="==" ||  expr.substr(pos,2)=="<=" || expr.substr(pos,2)==">=");
-        // < or >
-        bool oneCharOp = cmp && (pos+1) >= expr.length() && (expr[pos]=='<' || expr[pos]=='>');
-        // scan more whitespace
-        eat(true, '\0');
-        if (!(oneCharOp || twoCharOp)) throw std::runtime_error("Syntax error at pos=" + std::to_string(pos));
+    //cout << (this->expr).substr(pos, this->expr.length()-pos) << endl;
+    if (!cmp && pos < expr.length()) {
+        throw std::runtime_error("Syntax error at pos=" + std::to_string(pos));
     }
     return result;
 }
 
 double MathExpr::parse(string expr, bool cmp) {
     this->expr = expr;
-    pos = 0;
-    double result = parseExpr();
-    eat(true, '\0');
-    if (pos < expr.length()) {
-        // ==, <=, or >=
-        bool twoCharOp = cmp && (pos+2) >= expr.length() && (expr.substr(pos,2)=="==" ||  expr.substr(pos,2)=="<=" || expr.substr(pos,2)==">=");
-        // < or >
-        bool oneCharOp = cmp && (pos+1) >= expr.length() && (expr[pos]=='<' || expr[pos]=='>');
-        // scan more whitespace
-        eat(true, '\0');
-        if (!(oneCharOp || twoCharOp)) throw std::runtime_error("Syntax error at pos=" + std::to_string(pos));
-    }
+    return parse(cmp);
+}
+
+double MathExpr::parse(bool cmp, int& ref) {
+    this->expr = expr;
+    double result = parse(cmp);
+    ref = pos;
     return result;
 }
+
+double MathExpr::parse(string expr, bool cmp, int& ref) {
+    this->expr = expr;
+    double result = parse(cmp);
+    ref = pos;
+    return result;
+}
+
 
 bool MathExpr::eat(bool white, char ch) {
     if (white) {
@@ -145,14 +144,14 @@ double MathExpr::scanNumber() {
     return db;
 }
 
-int main(int argc, char* argv[]) {
-    if (argc > 2) return 1;
-    std::cout << std::fixed << std::setprecision(10);
-    MathExpr m = MathExpr("111");
-    double x = m.scanNumber();
-    MathExpr m2 = MathExpr("733");
-    double y = m2.scanNumber();
-    MathExpr m3 = MathExpr(argv[1]);
-    cout << argv[1] << ": " << m3.parse(false) << endl;
-    return 0;
-}
+//int main(int argc, char* argv[]) {
+//    if (argc > 2) return 1;
+//    std::cout << std::fixed << std::setprecision(10);
+//    MathExpr m = MathExpr("111");
+//    double x = m.scanNumber();
+//    MathExpr m2 = MathExpr("733");
+//    double y = m2.scanNumber();
+//    MathExpr m3 = MathExpr(argv[1]);
+//    cout << argv[1] << ": " << m3.parse(true) << endl;
+//    return 0;
+//}

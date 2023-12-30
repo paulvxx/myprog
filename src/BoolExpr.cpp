@@ -41,7 +41,7 @@ string BoolExpr::parseOr() {
 }
 
 string BoolExpr::parseAnd() {
-    string andop = parseCond();
+    string andop = parseUnary(false);
     while (eat(true, "&&")) {
         string nextop = parseAnd();
         if (andop=="false" || nextop=="false") andop="false";
@@ -51,14 +51,14 @@ string BoolExpr::parseAnd() {
     return andop;    
 }
 
-string BoolExpr::parseCond() {
-    string cond = parseUnary(false);
-    while (eat(true, "->")) {
-        if (cond=="true" || cond=="null") cond="null";
-        else cond="true";
-    }
-    return cond;
-}
+//string BoolExpr::parseCond() {
+//    string cond = parseUnary(false);
+//    while (eat(true, "->")) {
+//        if (cond=="true" || cond=="null") cond="null";
+//        else cond="true";
+//    }
+//    return cond;
+//}
 
 string BoolExpr::parseUnary(bool u) {
     string res = "";
@@ -95,7 +95,28 @@ string BoolExpr::parseUnary(bool u) {
     }
     else if (eat(!u, "true")) { error = false; res="true"; }
     else if (eat(!u, "false")) {error = false; res="false"; } 
-    else if (eat(!u, "null")) {error = false; res="null"; }
+    else {
+        MathRelation rel = MathRelation("");
+        int ref = 0;
+        int oldpos = pos;
+        if (eat(!u, "null")) {
+            error = false; res="null";
+            // null is part of a relation
+            if (eat(true, "==") || eat(true, "<=") || eat(true, ">=") || eat(true, "<") || eat(true, ">")) {
+                pos = oldpos; 
+                //cout << "What ??? " << expr.substr(pos, expr.length()-pos) << endl;
+                res = rel.parse(expr.substr(pos, expr.length()-pos), ref);  
+                pos+=ref; 
+            }
+        }
+        // parse relational operator
+        else {
+            pos = oldpos;
+            res = rel.parse(expr.substr(pos, expr.length()-pos), ref);
+            pos += ref;
+            error = false;
+        }
+    }
     if (error) throw std::runtime_error("Syntax error at pos=" + std::to_string(pos));
     return res;
 }

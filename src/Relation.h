@@ -26,6 +26,8 @@ class MathRelation : Relation {
         MathRelation(string e);
         string parse();
         string parse(string rel);
+        string parse(int& r);
+        string parse(string rel, int& r);
     private:
         string exprRel;
         int ref;

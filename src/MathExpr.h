@@ -8,6 +8,8 @@ class MathExpr {
         void printExpr();
         double parse(bool cmp);
         double parse(string expr, bool cmp);
+        double parse(bool cmp, int& ref);
+        double parse(string expr, bool cmp, int& ref);
         double parseExpr();
         double parseTerm();
         double parseFact(bool u);

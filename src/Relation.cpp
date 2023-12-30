@@ -43,6 +43,19 @@ MathRelation::MathRelation(string e) : Relation(e) {
     setPos(0);
 };
 
+string MathRelation::parse(string rel, int& r) {
+    setRel(rel);
+    string result = parse();
+    r = getPos();
+    return result;
+}
+
+string MathRelation::parse(int &r) {
+    string result = parse();
+    r = getPos();
+    return result;
+}
+
 string MathRelation::parse(string rel) {
     setRel(rel);
     return parse();
@@ -73,13 +86,17 @@ string MathRelation::parse() {
     else if (eat(true, "<")) cmpOp = 4;
     else throw std::runtime_error("Syntax error at pos=" + std::to_string(getPos()));
 
+    //cout << "What THE HECK ??? " << getPos() << ", " << getRel() << endl;
+
     if (eat(true, "null")) {
         isNull = true;
     }
     else {
-        string remaining = exprRel.substr(getPos(), exprRel.length());
-        y = m.parse(remaining, false, ref); 
-        setPos(ref);
+        string remaining = getRel().substr(getPos(), getRel().length()-getPos());
+        //cout << "What THE HECK ??? Salad " << getPos() << ", " << remaining << endl;
+        y = m.parse(remaining, true, ref); 
+        //cout << "What THE HECK ??? Angryfoo " << getPos() << ", " << remaining << endl;
+        setPos(ref+getPos());
     }
     if (isNull) return "null";
 
@@ -123,10 +140,10 @@ bool Relation::eat(bool white, string sub) {
 }
 
 
-int main(int argc, char* argv[]) {
-    if (argc > 2) return 1;
-    std::cout << std::fixed << std::setprecision(10);
-    MathRelation m = MathRelation(argv[1]);
-    cout << argv[1] << ": " << m.parse() << endl;
-    return 0;
-}
+//int main(int argc, char* argv[]) {
+//    if (argc > 2) return 1;
+//    std::cout << std::fixed << std::setprecision(10);
+//    MathRelation m = MathRelation(argv[1]);
+//    cout << argv[1] << ": " << m.parse() << endl;
+//    return 0;
+//}

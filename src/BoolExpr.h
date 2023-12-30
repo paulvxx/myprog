@@ -1,5 +1,6 @@
 #include <iostream>
 using namespace std;
+#include "Relation.h"
 #include <string>
 
 // new class to parse Boolean Expressions
@@ -10,7 +11,7 @@ class BoolExpr {
         string parse(string expr);
         string parseOr();
         string parseAnd();
-        string parseCond();
+        //string parseCond();
         string parseUnary(bool u);
         bool eat(bool white, string sub);
     private:  
