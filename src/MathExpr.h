@@ -6,8 +6,8 @@ class MathExpr {
     public:
         MathExpr(string e);
         void printExpr();
-        double parse();
-        double parse(string expr);
+        double parse(bool cmp);
+        double parse(string expr, bool cmp);
         double parseExpr();
         double parseTerm();
         double parseFact(bool u);
@@ -16,8 +16,6 @@ class MathExpr {
     private:
         string expr;
         double result;
-        bool isValidExpr;
-        bool opOccupied;
         int pos;
 };
 

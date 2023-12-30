@@ -6,9 +6,7 @@ using namespace std; // needed for just  cout <<
 
 MathExpr::MathExpr(string e) {
     this->expr = e;
-    isValidExpr = false;
     pos = 0;
-    opOccupied = false;
 }
 
 double MathExpr::parseExpr() {
@@ -49,7 +47,7 @@ double MathExpr::parseFact(bool u) {
         }
     }
     else if (eat(!u, '(')) {
-        if (pos < expr.length() && expr[pos]==')') throw std::runtime_error("Empty Expression");
+        if (pos < expr.length() && expr[pos]==')') throw std::runtime_error("Empty Expression at pos=" + std::to_string(pos));
         error = false;
         r = parseExpr();
         if (!eat(true, ')')) {
@@ -57,26 +55,46 @@ double MathExpr::parseFact(bool u) {
         }
     }
     else {
+        int oldpos = pos;
         error = false; 
-        r = scanNumber(); 
+        r = scanNumber();
+        if (oldpos == pos)  throw std::runtime_error("Missing Operand at pos=" + std::to_string(pos));
     }
     if (error) throw std::runtime_error("Syntax error at pos=" + std::to_string(pos));
     return r;
 }
 
-double MathExpr::parse() {
+double MathExpr::parse(bool cmp) {
     pos = 0;
-    isValidExpr = false;
-    opOccupied = false;
-    return parseExpr();
+    double result = parseExpr();
+    eat(true, '\0');
+    if (pos < expr.length()) {
+        // ==, <=, or >=
+        bool twoCharOp = cmp && (pos+2) >= expr.length() && (expr.substr(pos,2)=="==" ||  expr.substr(pos,2)=="<=" || expr.substr(pos,2)==">=");
+        // < or >
+        bool oneCharOp = cmp && (pos+1) >= expr.length() && (expr[pos]=='<' || expr[pos]=='>');
+        // scan more whitespace
+        eat(true, '\0');
+        if (!(oneCharOp || twoCharOp)) throw std::runtime_error("Syntax error at pos=" + std::to_string(pos));
+    }
+    return result;
 }
 
-double MathExpr::parse(string expr) {
+double MathExpr::parse(string expr, bool cmp) {
     this->expr = expr;
     pos = 0;
-    isValidExpr = false;
-    opOccupied = false;
-    return parseExpr();
+    double result = parseExpr();
+    eat(true, '\0');
+    if (pos < expr.length()) {
+        // ==, <=, or >=
+        bool twoCharOp = cmp && (pos+2) >= expr.length() && (expr.substr(pos,2)=="==" ||  expr.substr(pos,2)=="<=" || expr.substr(pos,2)==">=");
+        // < or >
+        bool oneCharOp = cmp && (pos+1) >= expr.length() && (expr[pos]=='<' || expr[pos]=='>');
+        // scan more whitespace
+        eat(true, '\0');
+        if (!(oneCharOp || twoCharOp)) throw std::runtime_error("Syntax error at pos=" + std::to_string(pos));
+    }
+    return result;
 }
 
 bool MathExpr::eat(bool white, char ch) {
@@ -103,7 +121,7 @@ double MathExpr::scanNumber() {
     while (pos < expr.length() && isValidNum) {
         char currentChar = expr[pos];
         if (isdigit(currentChar)) {
-            if (db==0 && !isDecimal && currentChar == '0') {
+            if (!hasLeadingZero && db==0 && !isDecimal && currentChar == '0') {
                 hasLeadingZero = true;
             } else if (!isDecimal && hasLeadingZero && currentChar != '.') {
                 throw std::runtime_error("Invalid number format at pos=" + std::to_string(pos));
@@ -135,6 +153,6 @@ int main(int argc, char* argv[]) {
     MathExpr m2 = MathExpr("733");
     double y = m2.scanNumber();
     MathExpr m3 = MathExpr(argv[1]);
-    cout << argv[1] << ": " << m3.parse() << endl;
+    cout << argv[1] << ": " << m3.parse(false) << endl;
     return 0;
 }
