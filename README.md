@@ -1,2 +1,3 @@
 # myprog
-My Progamming Language
+
+An experimental programming language I am trying to make.
